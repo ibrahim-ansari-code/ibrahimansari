@@ -1,0 +1,235 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 95%;
+    --foreground: 0 0% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 10%;
+    --primary: 0 0% 10%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 90%;
+    --secondary-foreground: 0 0% 10%;
+    --muted: 0 0% 90%;
+    --muted-foreground: 0 0% 40%;
+    --accent: 0 0% 90%;
+    --accent-foreground: 0 0% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 80%;
+    --input: 0 0% 80%;
+    --ring: 0 0% 10%;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    --radius: 0.5rem;
+
+    /* grid color */
+    --grid: 0 0% 85%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+
+    --grid: 217 16% 20%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground tracking-[0.005em] bg-grid;
+    font-family: var(--font-space-grotesk), system-ui, sans-serif;
+  }
+}
+
+/* Dot grid background */
+@layer utilities {
+  .bg-grid {
+    background-image: radial-gradient(circle, hsl(var(--grid)) 1px, transparent 1px);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 0;
+  }
+
+  .link-minimal {
+    @apply underline underline-offset-[4px] decoration-transparent hover:decoration-foreground/40 transition-colors;
+  }
+
+  /* Smooth underline + slight nudge without affecting layout at rest */
+  .hover-underline-nudge {
+    position: relative;
+    display: inline-block; /* ensure transform affects line box */
+    transition: transform 150ms ease;
+  }
+  .hover-underline-nudge::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -2px; /* sits just below baseline */
+    height: 2px;
+    width: 100%;
+    background-color: currentColor;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 200ms ease;
+  }
+  .hover-underline-nudge:hover {
+    transform: translateY(-1px);
+  }
+  .hover-underline-nudge:hover::after {
+    transform: scaleX(1);
+  }
+
+          /* Simple hover effects */
+          .hover-scale {
+            transition: all 0.2s ease;
+          }
+          .hover-scale:hover {
+            font-weight: 600;
+            text-decoration: underline;
+            text-underline-offset: 4px;
+          }
+
+          .hover-slide {
+            transition: all 0.2s ease;
+          }
+          .hover-slide:hover {
+            font-weight: 600;
+            text-decoration: underline;
+            text-underline-offset: 4px;
+          }
+
+          .hover-glow {
+            transition: all 0.2s ease;
+          }
+          .hover-glow:hover {
+            font-weight: 600;
+            text-decoration: underline;
+            text-underline-offset: 4px;
+          }
+
+  /* Custom typography styles */
+  .custom-header {
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    font-size: 1.125rem;
+  }
+
+  .custom-section-title {
+    font-weight: 600;
+    letter-spacing: -0.005em;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .custom-body {
+    line-height: 1.6;
+    letter-spacing: 0.01em;
+    font-size: 0.95rem;
+  }
+
+  .custom-small {
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  .custom-project-title {
+    font-weight: 500;
+    font-size: 0.95rem;
+  }
+
+  .custom-contact {
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* Section dividers */
+  .custom-divider {
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    margin: 28px 0;
+  }
+
+  .custom-divider-thick {
+    border-top: 2px solid rgba(0, 0, 0, 0.15);
+    margin: 24px 0;
+  }
+
+  /* Section borders */
+  .section-border {
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 24px;
+    margin: 16px 0;
+    background: rgba(255, 255, 255, 0.5);
+    transition: all 0.3s ease;
+  }
+
+  /* Eye tracking feedback */
+  .section-border.eye-gazing {
+    border-color: rgba(59, 130, 246, 0.5);
+    background: rgba(59, 130, 246, 0.05);
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+    transform: scale(1.02);
+  }
+
+  .eye-gaze-indicator {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 20px;
+    height: 20px;
+    background: #3b82f6;
+    border-radius: 50%;
+    animation: pulse 1s infinite;
+  }
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.2); opacity: 0.7; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Eye tracking visual feedback */
+.eye-gazing {
+  border-color: rgba(100, 100, 100, 0.5) !important;
+  background: rgba(100, 100, 100, 0.05) !important;
+  box-shadow: 0 0 20px rgba(100, 100, 100, 0.2) !important;
+  transform: scale(1.02) !important;
+  transition: all 0.3s ease !important;
+}
+
+
+}
