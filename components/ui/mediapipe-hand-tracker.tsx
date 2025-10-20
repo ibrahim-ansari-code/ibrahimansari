@@ -33,18 +33,18 @@ const FaceGestureTracker: React.FC = () => {
     } else if (gesture === 'smile') {
       console.log('😊 Smile - scrolling up');
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else if (gesture === 'head_left') {
-      console.log('👈 Head left - going to home');
+    } else if (gesture === 'head_shake') {
+      console.log('👈👉 Head shake - navigating to other page');
       lastNavigationTime.current = Date.now();
       setNavigationCooldown(true);
       setTimeout(() => setNavigationCooldown(false), NAVIGATION_COOLDOWN);
-      router.push('/');
-    } else if (gesture === 'head_right') {
-      console.log('👉 Head right - going to about');
-      lastNavigationTime.current = Date.now();
-      setNavigationCooldown(true);
-      setTimeout(() => setNavigationCooldown(false), NAVIGATION_COOLDOWN);
-      router.push('/about');
+      // Navigate to the page we're not currently on
+      const currentPath = window.location.pathname;
+      if (currentPath === '/') {
+        router.push('/about');
+      } else {
+        router.push('/');
+      }
     }
   }, [router]);
 
@@ -129,17 +129,25 @@ const FaceGestureTracker: React.FC = () => {
 
     let gesture = 'none';
 
-    // Tongue out detection (mouth open wide)
-    if (mouthAspectRatio > 0.3) {
+    // Check for tongue out (mouth open wide)
+    const isTongueOut = mouthAspectRatio > 0.3;
+    
+    // Check for head movement
+    const isHeadMoving = Math.abs(deltaX) > 0.05;
+    const headDirection = deltaX < 0 ? 'left' : 'right';
+
+    // Head shake detection - check for significant head movement first
+    if (Math.abs(deltaX) > 0.08) {
+      console.log(`🎯 HEAD SHAKE DETECTED: deltaX=${deltaX.toFixed(3)}`);
+      gesture = 'head_shake';
+    } else if (isTongueOut) {
+      // Just tongue out (scroll down)
       gesture = 'tongue_out';
-    }
-    // Smile detection (mouth corners up)
-    else if (mouthAspectRatio < 0.15 && mouthHeight < 0.02) {
-      gesture = 'smile';
-    }
-    // Head movement detection - much more sensitive
-    else if (Math.abs(deltaX) > 0.05) {
-      gesture = deltaX < 0 ? 'head_left' : 'head_right';
+    } else {
+      // Smile detection (mouth corners up)
+      if (mouthAspectRatio < 0.15 && mouthHeight < 0.02) {
+        gesture = 'smile';
+      }
     }
 
     if (gesture !== 'none' && Date.now() - lastGestureTime.current > COOLDOWN_TIME) {
@@ -147,6 +155,7 @@ const FaceGestureTracker: React.FC = () => {
       setGesture(gesture);
       executeGesture(gesture);
       lastGestureTime.current = Date.now();
+      
     }
   }, [executeGesture]);
 
@@ -268,7 +277,7 @@ const FaceGestureTracker: React.FC = () => {
               <div className="relative">
                 <video
                   ref={videoRef}
-                  className="w-32 h-24 object-cover rounded border"
+                  className="w-20 h-20 object-cover rounded border mx-auto"
                   style={{ transform: 'scaleX(-1)' }}
                   muted
                   playsInline
@@ -283,12 +292,8 @@ const FaceGestureTracker: React.FC = () => {
               </div>
               {isTracking && (
                 <div className="text-xs text-neutral-500 mt-1 text-center">
-                  tongue out = scroll down | smile = scroll up | head left = home | head right = about
-                </div>
-              )}
-              {navigationCooldown && (
-                <div className="text-xs text-orange-500 mt-1 text-center font-medium">
-                  ⏳ navigation cooldown active
+                  <div>tongue out = scroll down | smile = scroll up</div>
+                  <div>head shake = switch page</div>
                 </div>
               )}
             </div>

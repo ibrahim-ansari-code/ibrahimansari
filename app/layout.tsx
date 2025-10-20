@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import { Space_Grotesk } from 'next/font/google'
 import './globals.css'
-import { CursorGlow } from '@/components/ui/cursor-glow'
 import FaceGestureTracker from '@/components/ui/mediapipe-hand-tracker'
 
 const spaceGrotesk = Space_Grotesk({ 
@@ -24,8 +23,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${spaceGrotesk.variable} font-sans antialiased`}>
-        <CursorGlow />
-               <FaceGestureTracker />
+        <FaceGestureTracker />
         {children}
       </body>
     </html>
