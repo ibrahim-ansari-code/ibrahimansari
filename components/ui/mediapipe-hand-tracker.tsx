@@ -40,6 +40,7 @@ const FaceGestureTracker: React.FC = () => {
       setTimeout(() => setNavigationCooldown(false), NAVIGATION_COOLDOWN);
       // Navigate to the page we're not currently on
       const currentPath = window.location.pathname;
+      console.log(`🔄 Current path: ${currentPath}, navigating to: ${currentPath === '/' ? '/about' : '/'}`);
       if (currentPath === '/') {
         router.push('/about');
       } else {
@@ -136,18 +137,16 @@ const FaceGestureTracker: React.FC = () => {
     const isHeadMoving = Math.abs(deltaX) > 0.05;
     const headDirection = deltaX < 0 ? 'left' : 'right';
 
-    // Head shake detection - check for significant head movement first
+    // Head shake detection - check for significant head movement first (highest priority)
     if (Math.abs(deltaX) > 0.08) {
       console.log(`🎯 HEAD SHAKE DETECTED: deltaX=${deltaX.toFixed(3)}`);
       gesture = 'head_shake';
     } else if (isTongueOut) {
       // Just tongue out (scroll down)
       gesture = 'tongue_out';
-    } else {
-      // Smile detection (mouth corners up)
-      if (mouthAspectRatio < 0.15 && mouthHeight < 0.02) {
-        gesture = 'smile';
-      }
+    } else if (mouthAspectRatio < 0.15 && mouthHeight < 0.02) {
+      // Smile detection (mouth corners up) - lowest priority
+      gesture = 'smile';
     }
 
     if (gesture !== 'none' && Date.now() - lastGestureTime.current > COOLDOWN_TIME) {
