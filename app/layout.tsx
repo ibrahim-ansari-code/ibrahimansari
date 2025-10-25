@@ -14,7 +14,7 @@ const spaceGrotesk = Space_Grotesk({
 export const metadata: Metadata = {
   title: "ibrahim ansari — portfolio",
   description: 'about, experience, projects, research',
-  icons: { icon: '/favicon.ico' },
+  icons: { icon: '/logo.png' },
 }
 
 export default function RootLayout({
