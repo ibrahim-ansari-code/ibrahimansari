@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import { Space_Grotesk } from 'next/font/google'
 import './globals.css'
 import FaceGestureTracker from '@/components/ui/mediapipe-hand-tracker'
+import MusicPlayer from '@/components/ui/music-player'
+import { MusicProvider } from '@/contexts/MusicContext'
 
 const spaceGrotesk = Space_Grotesk({ 
   subsets: ['latin'], 
@@ -23,8 +25,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${spaceGrotesk.variable} font-sans antialiased`}>
-        <FaceGestureTracker />
-        {children}
+        <MusicProvider>
+          <FaceGestureTracker />
+          <MusicPlayer />
+          {children}
+        </MusicProvider>
       </body>
     </html>
   )

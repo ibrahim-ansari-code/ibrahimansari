@@ -5,6 +5,9 @@ import { useEffect, useState } from 'react';
 export default function Cursor() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isHovering, setIsHovering] = useState(false);
+  
+  // const test = () => {};
+  // let unused = "temp";
 
   useEffect(() => {
     const updateMousePosition = (e: MouseEvent) => {

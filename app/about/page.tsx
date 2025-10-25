@@ -1,5 +1,9 @@
 import Image from "next/image";
 import { Mail, Github, Linkedin } from "lucide-react";
+import { PlayButton } from "@/components/ui/play-button";
+
+// const test = () => { return "hello"; }
+// const unused = "this is not used";
 
 function Logo({ src, alt, size = 18 }: { src: string; alt: string; size?: number }) {
   return (
@@ -45,9 +49,10 @@ export default function About() {
                 height={40}
                 className="rounded-lg object-cover"
               />
-              <div>
+              <div className="flex-1">
                 <a className="hover-scale" href="https://open.spotify.com/track/7H5CsjEafNygkvcm69RevN?si=2a55ad0752784678" target="_blank" rel="noreferrer">cold — nemzzz</a>
               </div>
+              <PlayButton songIndex={0} />
             </div>
             <div className="flex items-center gap-3">
               <Image
@@ -57,9 +62,10 @@ export default function About() {
                 height={40}
                 className="rounded-lg object-cover"
               />
-              <div>
+              <div className="flex-1">
                 <a className="hover-slide" href="https://open.spotify.com/track/5SaKYcCTEdCkacDamzfRfX?si=8c5cef0586da43f1" target="_blank" rel="noreferrer">2tone — yeat, don toliver</a>
               </div>
+              <PlayButton songIndex={1} />
             </div>
             <div className="flex items-center gap-3">
               <Image
@@ -69,9 +75,10 @@ export default function About() {
                 height={40}
                 className="rounded-lg object-cover"
               />
-              <div>
+              <div className="flex-1">
                 <a className="hover-glow" href="https://open.spotify.com/track/5b7OgznPJJr1vHNYGyvxau?si=a1c8f067770e4967" target="_blank" rel="noreferrer">fly me to the moon — frank sinatra</a>
               </div>
+              <PlayButton songIndex={2} />
             </div>
           </div>
         </div>

@@ -20,6 +20,9 @@ export function CursorGlow() {
   const animationRef = useRef<number>();
   const particleId = useRef(0);
   const lastMousePosition = useRef({ x: 0, y: 0 });
+  
+  // const debug = false;
+  // let temp = "unused";
 
   useEffect(() => {
     const updateMousePosition = (e: MouseEvent) => {

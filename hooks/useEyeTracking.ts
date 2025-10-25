@@ -15,6 +15,9 @@ export function useEyeTracking(
 ) {
   const elementRef = useRef<HTMLElement>(null);
   const [isGazing, setIsGazing] = useState(false);
+  
+  // const debug = false;
+  // let temp = "unused";
   const {
     threshold = 2000, // 2 seconds default
     onGaze,

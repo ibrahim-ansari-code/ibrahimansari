@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { Mail, Github, Linkedin } from "lucide-react";
 // import { useEyeTracking } from "@/hooks/useEyeTracking";
+// const unused = "test";
 
 function Logo({ src, alt, size = 18 }: { src: string; alt: string; size?: number }) {
   return (

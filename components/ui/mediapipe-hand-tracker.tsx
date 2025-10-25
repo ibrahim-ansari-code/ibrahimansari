@@ -1,51 +1,39 @@
 'use client';
 
-import React, { useRef, useEffect, useState, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useRef, useCallback, useEffect } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 
-const FaceGestureTracker: React.FC = () => {
-  const router = useRouter();
+const FaceGestureTracker = () => {
   const [isTracking, setIsTracking] = useState(false);
-  const [gesture, setGesture] = useState<string>('');
   const [faceDetected, setFaceDetected] = useState(false);
+  const [gesture, setGesture] = useState('');
+  const [error, setError] = useState('');
   const [navigationCooldown, setNavigationCooldown] = useState(false);
-  const [error, setError] = useState<string>('');
 
   const videoRef = useRef<HTMLVideoElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
-  const animationRef = useRef<number>();
-  const lastGestureTime = useRef<number>(0);
-  const lastNavigationTime = useRef<number>(0);
   const faceMeshRef = useRef<any>(null);
-  const isMediaPipeClosedRef = useRef<boolean>(false);
-  
-  // Head shake detection state
-  const headPositions = useRef<number[]>([]);
-  const lastHeadDirection = useRef<'left' | 'right' | null>(null);
-  const headShakeStartTime = useRef<number>(0);
+  const isMediaPipeClosedRef = useRef(false);
+  const lastGestureTime = useRef(0);
+  const lastHeadShakeTime = useRef(0);
+  const lastNavigationTime = useRef(0);
 
-  const COOLDOWN_TIME = 3000; // 3 seconds cooldown to prevent rapid navigation
-  const NAVIGATION_COOLDOWN = 3000; // 3 seconds for left/right navigation specifically
+  const router = useRouter();
+  const currentPage = usePathname() === '/' ? 'home' : 'about';
+
+  const COOLDOWN_TIME = 3000;
+  const NAVIGATION_COOLDOWN = 3000;
 
   const executeGesture = useCallback((gesture: string) => {
-    console.log('🎯 EXECUTING FACE GESTURE:', gesture);
-
-    // Face gesture actions
     if (gesture === 'tongue_out') {
-      console.log('👅 Tongue out - scrolling down');
       window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     } else if (gesture === 'smile') {
-      console.log('😊 Smile - scrolling up');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else if (gesture === 'head_shake') {
-      console.log('👈👉 Head shake - navigating to other page');
       lastNavigationTime.current = Date.now();
       setNavigationCooldown(true);
       setTimeout(() => setNavigationCooldown(false), NAVIGATION_COOLDOWN);
-      // Navigate to the page we're not currently on
       const currentPath = window.location.pathname;
-      console.log(`🔄 Current path: ${currentPath}, navigating to: ${currentPath === '/' ? '/about' : '/'}`);
       if (currentPath === '/') {
         router.push('/about');
       } else {
@@ -56,12 +44,12 @@ const FaceGestureTracker: React.FC = () => {
 
   const initializeMediaPipe = useCallback(async () => {
     try {
-      // Dynamically import MediaPipe
       const { FaceMesh } = await import('@mediapipe/face_mesh');
-      const { Camera } = await import('@mediapipe/camera_utils');
       
       const faceMesh = new FaceMesh({
-        locateFile: (file: string) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`
+        locateFile: (file) => {
+          return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
+        }
       });
 
       faceMesh.setOptions({
@@ -71,10 +59,7 @@ const FaceGestureTracker: React.FC = () => {
         minTrackingConfidence: 0.5
       });
 
-      faceMeshRef.current = faceMesh;
-      isMediaPipeClosedRef.current = false;
-
-      faceMesh.onResults((results: any) => {
+      faceMesh.onResults((results) => {
         if (results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0) {
           setFaceDetected(true);
           detectGestures(results.multiFaceLandmarks[0]);
@@ -84,9 +69,9 @@ const FaceGestureTracker: React.FC = () => {
         }
       });
 
+      faceMeshRef.current = faceMesh;
       return faceMesh;
     } catch (err) {
-      console.error('❌ MediaPipe initialization error:', err);
       setError('Failed to initialize face detection');
       return null;
     }
@@ -95,22 +80,18 @@ const FaceGestureTracker: React.FC = () => {
   const detectGestures = useCallback((landmarks: any) => {
     if (!landmarks || landmarks.length < 468) return;
 
-    // Key landmarks for mouth detection
     const mouthLeft = landmarks[61];
     const mouthRight = landmarks[291];
     const mouthTop = landmarks[13];
     const mouthBottom = landmarks[14];
 
-    // Calculate mouth opening
     const mouthHeight = Math.abs(mouthBottom.y - mouthTop.y);
     const mouthWidth = Math.abs(mouthRight.x - mouthLeft.x);
     const mouthAspectRatio = mouthHeight / mouthWidth;
 
-    // Calculate face bounding box center for more reliable head tracking
     let minX = 1, maxX = 0, minY = 1, maxY = 0;
     
-    // Sample key face landmarks to get bounding box
-    const keyLandmarks = [1, 33, 61, 91, 121, 151, 181, 234, 262, 291, 321, 362, 391, 454]; // nose, eyes, mouth, ears
+    const keyLandmarks = [1, 33, 61, 91, 121, 151, 181, 234, 262, 291, 321, 362, 391, 454];
     
     keyLandmarks.forEach(index => {
       if (landmarks[index]) {
@@ -128,79 +109,44 @@ const FaceGestureTracker: React.FC = () => {
     const deltaX = headCenterX - screenCenter.x;
     const deltaY = headCenterY - screenCenter.y;
 
-    // Debug logging for head movement
-    if (Math.abs(deltaX) > 0.02) {
-      console.log(`👤 HEAD POSITION: deltaX=${deltaX.toFixed(3)}, headCenter=${headCenterX.toFixed(3)}, bbox=(${minX.toFixed(2)}-${maxX.toFixed(2)})`);
-    }
-
     let gesture = 'none';
 
-    // Check for tongue out (mouth open wide)
     const isTongueOut = mouthAspectRatio > 0.3;
-    
-    // Check for head movement
     const isHeadMoving = Math.abs(deltaX) > 0.05;
     const headDirection = deltaX < 0 ? 'left' : 'right';
 
-    // Track head positions for shake detection
-    headPositions.current.push(headCenterX);
-    if (headPositions.current.length > 10) {
-      headPositions.current.shift(); // Keep only last 10 positions
-    }
-
-    // Head shake detection - look for left-right-left or right-left-right pattern
     let isHeadShake = false;
-    if (headPositions.current.length >= 6 && Math.abs(deltaX) > 0.06) {
-      const positions = headPositions.current;
-      const recent = positions.slice(-6);
-      
-      // Check for oscillation pattern (left-right-left or right-left-right)
-      let directionChanges = 0;
-      for (let i = 1; i < recent.length - 1; i++) {
-        const prev = recent[i-1];
-        const curr = recent[i];
-        const next = recent[i+1];
-        
-        if ((curr < prev && curr < next) || (curr > prev && curr > next)) {
-          directionChanges++;
-        }
-      }
-      
-      // If we have at least 2 direction changes in 6 frames, it's a shake
-      if (directionChanges >= 2) {
-        isHeadShake = true;
-        console.log(`🎯 HEAD SHAKE DETECTED: directionChanges=${directionChanges}, deltaX=${deltaX.toFixed(3)}`);
-      }
+    if (Math.abs(deltaX) > 0.06 && Math.abs(deltaY) < 0.25) {
+      isHeadShake = true;
     }
 
-    // Gesture priority: Head shake > Tongue out > Smile
     if (isHeadShake) {
       gesture = 'head_shake';
     } else if (isTongueOut) {
-      // Just tongue out (scroll down)
       gesture = 'tongue_out';
     } else if (mouthAspectRatio < 0.15 && mouthHeight < 0.02) {
-      // Smile detection (mouth corners up) - lowest priority
       gesture = 'smile';
     }
 
-    if (gesture !== 'none' && Date.now() - lastGestureTime.current > COOLDOWN_TIME) {
-      console.log(`🎭 FACE GESTURE DETECTED: ${gesture} (mouth ratio: ${mouthAspectRatio.toFixed(3)}, deltaX: ${deltaX.toFixed(3)})`);
-      setGesture(gesture);
-      executeGesture(gesture);
-      lastGestureTime.current = Date.now();
-      
-      // Reset head shake tracking after successful gesture
+    if (gesture !== 'none') {
       if (gesture === 'head_shake') {
-        headPositions.current = [];
-        lastHeadDirection.current = null;
+        const now = Date.now();
+        if (now - lastHeadShakeTime.current > 2000) {
+          setGesture(gesture);
+          executeGesture(gesture);
+          lastGestureTime.current = now;
+          lastHeadShakeTime.current = now;
+        }
+      } else if (Date.now() - lastGestureTime.current > COOLDOWN_TIME) {
+        setGesture(gesture);
+        executeGesture(gesture);
+        lastGestureTime.current = Date.now();
       }
     }
   }, [executeGesture]);
 
   const startCamera = useCallback(async () => {
     try {
-      console.log('🎥 Starting camera...');
       const stream = await navigator.mediaDevices.getUserMedia({ 
         video: { 
           width: 640, 
@@ -214,20 +160,16 @@ const FaceGestureTracker: React.FC = () => {
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         videoRef.current.play();
-        console.log('✅ Camera access granted');
         
-        // Wait for video to be ready
         await new Promise((resolve) => {
           if (videoRef.current) {
             videoRef.current.onloadedmetadata = () => {
-              console.log('📹 Video metadata loaded');
               resolve(true);
             };
           }
         });
       }
 
-      // Initialize MediaPipe
       const faceMesh = await initializeMediaPipe();
       if (faceMesh && videoRef.current) {
         const { Camera } = await import('@mediapipe/camera_utils');
@@ -237,7 +179,7 @@ const FaceGestureTracker: React.FC = () => {
               try {
                 await faceMesh.send({ image: videoRef.current });
               } catch (err) {
-                console.log('MediaPipe frame processing error:', err);
+                // ignore
               }
             }
           },
@@ -247,7 +189,6 @@ const FaceGestureTracker: React.FC = () => {
         camera.start();
       }
     } catch (err) {
-      console.error('❌ Camera error:', err);
       setError('Camera access denied');
     }
   }, [initializeMediaPipe]);
@@ -265,81 +206,64 @@ const FaceGestureTracker: React.FC = () => {
           faceMeshRef.current.close();
           isMediaPipeClosedRef.current = true;
         } catch (err) {
-          console.log('MediaPipe already closed');
           isMediaPipeClosedRef.current = true;
         }
-        faceMeshRef.current = null;
       }
     }
-
-    return () => {
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach(track => track.stop());
-      }
-      if (faceMeshRef.current && !isMediaPipeClosedRef.current) {
-        try {
-          faceMeshRef.current.close();
-          isMediaPipeClosedRef.current = true;
-        } catch (err) {
-          console.log('MediaPipe already closed');
-          isMediaPipeClosedRef.current = true;
-        }
-        faceMeshRef.current = null;
-      }
-    };
   }, [isTracking, startCamera]);
 
   return (
-    <>
-      {/* Toggle button for face tracking */}
-      <div className="fixed top-4 right-4 z-50">
+    <div className="fixed top-4 right-4 z-50">
+      {!isTracking ? (
         <button
-          onClick={() => setIsTracking(!isTracking)}
-          className="px-4 py-2 bg-white border border-neutral-300 text-neutral-600 hover:bg-neutral-50"
+          onClick={() => setIsTracking(true)}
+          className="px-4 py-2 rounded text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors border border-gray-200"
         >
-          {isTracking ? 'disable face gestures' : 'enable face gestures'}
+          enable face gestures
         </button>
-      </div>
-
-      {isTracking && (
-        <>
-          <div className="fixed bottom-4 right-4 z-40">
-            <div className="bg-white p-3 border border-neutral-200 rounded shadow-lg">
-              <div className="flex items-center gap-2 mb-2">
-                <div className={`w-2 h-2 rounded-full animate-pulse ${
-                  faceDetected ? 'bg-green-500' : 'bg-red-500'
-                }`}></div>
-                <div className="text-xs text-neutral-600 font-medium">
-                  {faceDetected ? 'face detected' : 'no face'}
-                </div>
+      ) : (
+        <div className="flex flex-col gap-2">
+          <button
+            onClick={() => setIsTracking(false)}
+            className="px-4 py-2 rounded text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors border border-gray-200"
+          >
+            disable face gestures
+          </button>
+          
+          <div className="bg-white rounded-lg border border-gray-200 shadow-lg p-3 w-64">
+            <div className="flex flex-col items-center gap-2">
+              <div className="flex items-center gap-1.5 text-xs text-gray-700">
+                <div className={`w-1.5 h-1.5 rounded-full ${faceDetected ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+                <span>{faceDetected ? 'face detected' : 'no face detected'}</span>
               </div>
-              <div className="relative">
-                <video
-                  ref={videoRef}
-                  className="w-20 h-20 object-cover rounded border mx-auto"
-                  style={{ transform: 'scaleX(-1)' }}
-                  muted
-                  playsInline
-                />
-                <canvas
-                  ref={canvasRef}
-                  className="absolute inset-0 w-full h-full opacity-0"
-                />
-              </div>
-              <div className="text-xs text-neutral-400 mt-1 text-center">
-                MediaPipe Face Mesh
-              </div>
-              {isTracking && (
-                <div className="text-xs text-neutral-500 mt-1 text-center">
-                  <div>tongue out = scroll down | smile = scroll up</div>
+              
+              <video
+                ref={videoRef}
+                className="w-20 h-20 object-cover rounded border border-gray-300 mx-auto"
+                autoPlay
+                muted
+                playsInline
+              />
+              
+              <div className="text-center text-xs text-gray-700">
+                <div className="font-medium mb-1">MediaPipe Face Mesh</div>
+                <div className="space-y-0.5 text-xs">
+                  <div>tongue out = scroll down</div>
+                  <div>smile = scroll up</div>
                   <div>head shake = switch page</div>
                 </div>
-              )}
+              </div>
             </div>
           </div>
-        </>
+        </div>
       )}
-    </>
+      
+      {error && (
+        <div className="text-red-500 text-xs text-center mt-2">
+          {error}
+        </div>
+      )}
+    </div>
   );
 };
 
