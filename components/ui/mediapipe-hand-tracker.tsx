@@ -19,6 +19,11 @@ const FaceGestureTracker: React.FC = () => {
   const lastNavigationTime = useRef<number>(0);
   const faceMeshRef = useRef<any>(null);
   const isMediaPipeClosedRef = useRef<boolean>(false);
+  
+  // Head shake detection state
+  const headPositions = useRef<number[]>([]);
+  const lastHeadDirection = useRef<'left' | 'right' | null>(null);
+  const headShakeStartTime = useRef<number>(0);
 
   const COOLDOWN_TIME = 3000; // 3 seconds cooldown to prevent rapid navigation
   const NAVIGATION_COOLDOWN = 3000; // 3 seconds for left/right navigation specifically
@@ -137,9 +142,39 @@ const FaceGestureTracker: React.FC = () => {
     const isHeadMoving = Math.abs(deltaX) > 0.05;
     const headDirection = deltaX < 0 ? 'left' : 'right';
 
-    // Head shake detection - check for significant head movement first (highest priority)
-    if (Math.abs(deltaX) > 0.08) {
-      console.log(`🎯 HEAD SHAKE DETECTED: deltaX=${deltaX.toFixed(3)}`);
+    // Track head positions for shake detection
+    headPositions.current.push(headCenterX);
+    if (headPositions.current.length > 10) {
+      headPositions.current.shift(); // Keep only last 10 positions
+    }
+
+    // Head shake detection - look for left-right-left or right-left-right pattern
+    let isHeadShake = false;
+    if (headPositions.current.length >= 6 && Math.abs(deltaX) > 0.06) {
+      const positions = headPositions.current;
+      const recent = positions.slice(-6);
+      
+      // Check for oscillation pattern (left-right-left or right-left-right)
+      let directionChanges = 0;
+      for (let i = 1; i < recent.length - 1; i++) {
+        const prev = recent[i-1];
+        const curr = recent[i];
+        const next = recent[i+1];
+        
+        if ((curr < prev && curr < next) || (curr > prev && curr > next)) {
+          directionChanges++;
+        }
+      }
+      
+      // If we have at least 2 direction changes in 6 frames, it's a shake
+      if (directionChanges >= 2) {
+        isHeadShake = true;
+        console.log(`🎯 HEAD SHAKE DETECTED: directionChanges=${directionChanges}, deltaX=${deltaX.toFixed(3)}`);
+      }
+    }
+
+    // Gesture priority: Head shake > Tongue out > Smile
+    if (isHeadShake) {
       gesture = 'head_shake';
     } else if (isTongueOut) {
       // Just tongue out (scroll down)
@@ -155,6 +190,11 @@ const FaceGestureTracker: React.FC = () => {
       executeGesture(gesture);
       lastGestureTime.current = Date.now();
       
+      // Reset head shake tracking after successful gesture
+      if (gesture === 'head_shake') {
+        headPositions.current = [];
+        lastHeadDirection.current = null;
+      }
     }
   }, [executeGesture]);
 
