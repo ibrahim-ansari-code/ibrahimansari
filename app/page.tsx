@@ -54,6 +54,15 @@ export default function Home() {
           <div className="custom-section-title">experience</div>
           <div className="flex items-center gap-3">
             <div className="shadow-md rounded-lg p-3 bg-white">
+              <Logo src="/Brikli Logo.jpeg" alt="Brikli" size={36} />
+            </div>
+            <div>
+              <div className="custom-project-title">machine learning engineer — <a href="https://brikli.com/" target="_blank" rel="noreferrer" className="hover-glow">brikli</a></div>
+              <div className="text-neutral-600 custom-small">making housing easier</div>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="shadow-md rounded-lg p-3 bg-white">
               <Logo src="/Tablingos Overview.jpeg" alt="Tablingos" size={36} />
             </div>
             <div>
