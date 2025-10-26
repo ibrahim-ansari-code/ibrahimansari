@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Mail, Github, Linkedin } from "lucide-react";
+import { Mail, Github, Linkedin, Twitter, Instagram } from "lucide-react";
 import { PlayButton } from "@/components/ui/play-button";
 
 // const test = () => { return "hello"; }
@@ -133,10 +133,16 @@ export default function About() {
                 <Mail size={20} className="text-neutral-600" />
               </a>
               <a className="hover-slide" href="https://github.com/ibrahim-ansari-code" target="_blank" rel="noreferrer" title="GitHub">
-                <Github size={20} className="text-neutral-600" />
+                <Github size={20} className="text-gray-800" />
               </a>
               <a className="hover-glow" href="https://www.linkedin.com/in/ibrahim-ansari-775529270/" target="_blank" rel="noreferrer" title="LinkedIn">
                 <Logo src="/linkedin.webp" alt="LinkedIn" size={20} />
+              </a>
+              <a className="hover-scale" href="https://x.com/IbrahimAns20615" target="_blank" rel="noreferrer" title="X (Twitter)">
+                <Twitter size={20} className="text-black" />
+              </a>
+              <a className="hover-slide" href="https://www.instagram.com/ibrahim.ansr/" target="_blank" rel="noreferrer" title="Instagram">
+                <Instagram size={20} className="text-pink-600" />
               </a>
             </div>
           </footer>
