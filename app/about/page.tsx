@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { Mail, Github, Linkedin } from "lucide-react";
 import { PlayButton } from "@/components/ui/play-button";
 
@@ -32,7 +33,7 @@ export default function About() {
         <div className="custom-body space-y-4 animate-[fadeIn_500ms_ease]">
           <div className="flex items-center justify-between">
             <h1 className="custom-header">Other</h1>
-            <a href="/" className="font-extralight hover-scale">home</a>
+            <Link href="/" className="font-extralight hover-scale">home</Link>
           </div>
         </div>
 

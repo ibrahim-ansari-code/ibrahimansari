@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { Mail, Github, Linkedin } from "lucide-react";
 // import { useEyeTracking } from "@/hooks/useEyeTracking";
 // const unused = "test";
@@ -35,12 +36,12 @@ export default function Home() {
               <h1 className="custom-header">Ibrahim Ansari</h1>
               <Logo src="/waterloo-logo.png" alt="University of Waterloo" size={32} />
             </div>
-            <a 
+            <Link 
               href="/about" 
               className="font-extralight hover-scale"
             >
               other
-            </a>
+            </Link>
           </div>
           <div className="text-neutral-600">
             <span>management engineering @ uwaterloo</span>
