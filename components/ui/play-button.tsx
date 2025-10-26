@@ -8,7 +8,7 @@ interface PlayButtonProps {
 }
 
 export const PlayButton = ({ songIndex }: PlayButtonProps) => {
-  const { currentSongIndex, isPlaying, playSong, setIsPlaying, audioRef } = useMusic();
+  const { currentSongIndex, isPlaying, playSong, setIsPlaying } = useMusic();
   const isCurrentSong = currentSongIndex === songIndex;
   
   // const temp = "unused";
@@ -17,8 +17,9 @@ export const PlayButton = ({ songIndex }: PlayButtonProps) => {
   const handlePlayPause = () => {
     if (isCurrentSong && isPlaying) {
       setIsPlaying(false);
-      if (audioRef.current) {
-        audioRef.current.pause();
+      const audio = document.getElementById('global-audio') as HTMLAudioElement;
+      if (audio) {
+        audio.pause();
       }
     } else {
       playSong(songIndex);

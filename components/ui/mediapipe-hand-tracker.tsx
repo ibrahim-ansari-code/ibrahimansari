@@ -5,7 +5,16 @@ import { useRouter, usePathname } from 'next/navigation';
 
 const FaceGestureTracker = () => {
   const [isTracking, setIsTracking] = useState(false);
+  const [isClient, setIsClient] = useState(false);
   const [faceDetected, setFaceDetected] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+    const saved = localStorage.getItem('faceGesturesEnabled');
+    if (saved === 'true') {
+      setIsTracking(true);
+    }
+  }, []);
   const [gesture, setGesture] = useState('');
   const [error, setError] = useState('');
   const [navigationCooldown, setNavigationCooldown] = useState(false);
@@ -116,7 +125,7 @@ const FaceGestureTracker = () => {
     const headDirection = deltaX < 0 ? 'left' : 'right';
 
     let isHeadShake = false;
-    if (Math.abs(deltaX) > 0.06 && Math.abs(deltaY) < 0.25) {
+    if (Math.abs(deltaX) > 0.1 && Math.abs(deltaY) < 0.25) {
       isHeadShake = true;
     }
 
@@ -216,7 +225,10 @@ const FaceGestureTracker = () => {
     <div className="fixed top-4 right-4 z-50">
       {!isTracking ? (
         <button
-          onClick={() => setIsTracking(true)}
+          onClick={() => {
+            setIsTracking(true);
+            localStorage.setItem('faceGesturesEnabled', 'true');
+          }}
           className="px-4 py-2 rounded text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors border border-gray-200"
         >
           enable face gestures
@@ -224,7 +236,10 @@ const FaceGestureTracker = () => {
       ) : (
         <div className="flex flex-col gap-2">
           <button
-            onClick={() => setIsTracking(false)}
+            onClick={() => {
+              setIsTracking(false);
+              localStorage.setItem('faceGesturesEnabled', 'false');
+            }}
             className="px-4 py-2 rounded text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors border border-gray-200"
           >
             disable face gestures

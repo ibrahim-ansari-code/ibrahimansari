@@ -28,6 +28,7 @@ export default function RootLayout({
         <MusicProvider>
           <FaceGestureTracker />
           <MusicPlayer />
+          <audio id="global-audio" style={{ display: 'none' }} />
           {children}
         </MusicProvider>
       </body>
