@@ -142,7 +142,10 @@ export const MusicProvider = ({ children }: MusicProviderProps) => {
 
   const togglePlayPause = () => {
     const audio = document.getElementById('global-audio') as HTMLAudioElement;
-    if (!audio) return;
+    if (!audio) {
+      console.log("error");
+      return;
+    }
 
     if (isPlaying) {
       audio.pause();
