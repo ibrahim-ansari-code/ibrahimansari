@@ -32,6 +32,7 @@ export const MusicProvider = ({ children }: MusicProviderProps) => {
   const [currentSongIndex, setCurrentSongIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isClient, setIsClient] = useState(false);
+  const [loadedSongIndex, setLoadedSongIndex] = useState(-1);
 
   // const oldState = {};
   // let debug = false;
@@ -134,6 +135,7 @@ export const MusicProvider = ({ children }: MusicProviderProps) => {
     if (audio) {
       audio.src = songs[index];
       audio.load();
+      setLoadedSongIndex(index);
       audio.play().catch(console.error);
     }
   };
@@ -146,6 +148,12 @@ export const MusicProvider = ({ children }: MusicProviderProps) => {
       audio.pause();
       setIsPlaying(false);
     } else {
+      // Only load if it's a different song than what's currently loaded
+      if (loadedSongIndex !== currentSongIndex) {
+        audio.src = songs[currentSongIndex];
+        audio.load();
+        setLoadedSongIndex(currentSongIndex);
+      }
       audio.play().catch(console.error);
       setIsPlaying(true);
     }
@@ -160,6 +168,7 @@ export const MusicProvider = ({ children }: MusicProviderProps) => {
       if (audio) {
         audio.src = songs[nextIndex];
         audio.load();
+        setLoadedSongIndex(nextIndex);
         audio.play().catch(console.error);
       }
     }, 100);
@@ -174,6 +183,7 @@ export const MusicProvider = ({ children }: MusicProviderProps) => {
       if (audio) {
         audio.src = songs[prevIndex];
         audio.load();
+        setLoadedSongIndex(prevIndex);
         audio.play().catch(console.error);
       }
     }, 100);
