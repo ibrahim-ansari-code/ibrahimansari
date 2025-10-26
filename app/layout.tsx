@@ -4,6 +4,7 @@ import './globals.css'
 import FaceGestureTracker from '@/components/ui/mediapipe-hand-tracker'
 import MusicPlayer from '@/components/ui/music-player'
 import { MusicProvider } from '@/contexts/MusicContext'
+import { Analytics } from '@vercel/analytics/react'
 
 const spaceGrotesk = Space_Grotesk({ 
   subsets: ['latin'], 
@@ -31,6 +32,7 @@ export default function RootLayout({
           <audio id="global-audio" style={{ display: 'none' }} />
           {children}
         </MusicProvider>
+        <Analytics />
       </body>
     </html>
   )
