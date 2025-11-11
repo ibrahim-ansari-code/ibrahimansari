@@ -33,7 +33,10 @@ export default function About() {
         <div className="custom-body space-y-4 animate-[fadeIn_500ms_ease]">
           <div className="flex items-center justify-between">
             <h1 className="custom-header">Other</h1>
-            <Link href="/" className="font-extralight hover-scale">home</Link>
+            <div className="flex items-center gap-4">
+              <Link href="/progress" className="font-extralight hover-scale">progress</Link>
+              <Link href="/" className="font-extralight hover-scale">home</Link>
+            </div>
           </div>
         </div>
 

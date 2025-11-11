@@ -36,12 +36,20 @@ export default function Home() {
               <h1 className="custom-header">Ibrahim Ansari</h1>
               <Logo src="/waterloo-logo.png" alt="University of Waterloo" size={32} />
             </div>
-            <Link 
-              href="/about" 
-              className="font-extralight hover-scale"
-            >
-              other
-            </Link>
+            <div className="flex items-center gap-4">
+              <Link 
+                href="/progress" 
+                className="font-extralight hover-scale"
+              >
+                progress
+              </Link>
+              <Link 
+                href="/about" 
+                className="font-extralight hover-scale"
+              >
+                other
+              </Link>
+            </div>
           </div>
           <div className="text-neutral-600">
             <span>management engineering @ uwaterloo</span>
