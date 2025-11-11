@@ -38,34 +38,16 @@ export default function Progress() {
         <div className="custom-divider" />
 
         <div className="custom-body space-y-6 section-border">
-          <div className="custom-section-title">daily updates</div>
+          <div className="custom-section-title">weekly updates</div>
           
-          {/* Example progress entry - you can add more entries here */}
           <div className="space-y-3 pb-4 border-b border-neutral-200 last:border-b-0 last:pb-0">
             <div className="text-neutral-500 custom-small">
-              {new Date().toLocaleDateString('en-US', { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-              })}
+              November 2nd - 8th, 2024
             </div>
-            <div className="text-neutral-800">
-              <p>Working on building out the progress page for my portfolio. Excited to start tracking daily updates!</p>
+            <div className="text-neutral-800 space-y-2">
+              <p>Working on <a href="https://www.letthemhit.ca/" target="_blank" rel="noreferrer" className="hover-glow">letthemhit.ca</a> (got botted multiple times). Added a couple features to brikli. Continued learning ML, focusing on the math side of things.</p>
             </div>
-            {/* Uncomment and add image when you have one */}
-            {/* <div className="mt-3">
-              <Image
-                src="/your-image.jpg"
-                alt="Progress update"
-                width={600}
-                height={400}
-                className="rounded-lg object-cover w-full"
-              />
-            </div> */}
           </div>
-
-          {/* Add more progress entries here following the same structure */}
         </div>
 
         <div className="custom-divider" />
